@@ -163,6 +163,21 @@
             </div>
 
             <h3 align="middle">Part 3: Transforms</h3>
+            <div style="display: flex; justify-content: center">
+                <figure>
+                    <img
+                        src="./img/task3-robot-wave.png"
+                        align="middle"
+                        width="800px"
+                    />
+                    <figcaption align="middle">Robot.</figcaption>
+                </figure>
+            </div>
+            <p>
+                We attempted to have the robot wave with one arm, while making
+                the gesture more animated by also adjusting the one of the legs
+                and non-waving arm.
+            </p>
 
             <h2 align="middle">Section II: Sampling</h2>
 
@@ -210,14 +225,14 @@
                             <div style="display: flex; justify-content: center">
                                 <figure>
                                     <img
-                                        src="./img/task2-basic-test4-4.png"
+                                        src="./img/task5-texmap-test6-nearest1.png"
                                         align="middle"
                                         width="400px"
                                     />
                                     <figcaption align="middle">
                                         Screenshot from
-                                        <code>basic/test4.svg</code> with sample
-                                        rate of 4.
+                                        <code>texmap/test6.svg</code> with
+                                        nearest neighbor and no supersampling.
                                     </figcaption>
                                 </figure>
                             </div>
@@ -226,14 +241,15 @@
                             <div style="display: flex; justify-content: center">
                                 <figure>
                                     <img
-                                        src="./img/task2-basic-test4-16.png"
+                                        src="./img/task5-texmap-test6-nearest16.png"
                                         align="middle"
                                         width="400px"
                                     />
                                     <figcaption align="middle">
                                         Screenshot from
-                                        <code>basic/test4.svg</code> with sample
-                                        rate of 16.
+                                        <code>texmap/test6.svg</code> with
+                                        nearest neighbor and a sample rate of
+                                        16.
                                     </figcaption>
                                 </figure>
                             </div>
@@ -245,14 +261,30 @@
                             <div style="display: flex; justify-content: center">
                                 <figure>
                                     <img
-                                        src="./img/task2-basic-test4-1.png"
+                                        src="./img/task5-texmap-test6-bilinear1.png"
                                         align="middle"
                                         width="400px"
                                     />
                                     <figcaption align="middle">
                                         Screenshot from
-                                        <code>basic/test4.svg</code> with no
-                                        supersampling.
+                                        <code>texmap/test6.svg</code> with
+                                        bilinear and no supersampling.
+                                    </figcaption>
+                                </figure>
+                            </div>
+                        </td>
+                        <td>
+                            <div style="display: flex; justify-content: center">
+                                <figure>
+                                    <img
+                                        src="./img/task5-texmap-test6-bilinear16.png"
+                                        align="middle"
+                                        width="400px"
+                                    />
+                                    <figcaption align="middle">
+                                        Screenshot from
+                                        <code>texmap/test6.svg</code> with
+                                        bilinear and a sample rate of 16.
                                     </figcaption>
                                 </figure>
                             </div>
@@ -260,10 +292,33 @@
                     </tr>
                 </table>
             </div>
+            <p>
+                The images above clearly show how bilinear sampling produces a
+                higher quality image than nearest neighbor sampling. The
+                difference is especially stark when there is no supersampling
+                applied. The nearest neighbor image shows a lot more aliasing in
+                comparison to its bilinear counterpart. Although with a
+                supersampling rate of 16, the images are closer in quality,
+                there are still aliasing artifacts in the nearest neighbor
+                sampled image that do not show in the bilinear smapled image.
+                Since nearest neighbor does not do any linear interpolation of
+                colors, the resulting image will appear more jagged. These
+                jagged edges will be more pronounced in images with curves and
+                bends, such as the distorted seal image shown above. In such
+                cases, bilinear sampling will outperform nearest neighbor due to
+                the sampling it does.
+            </p>
 
             <h3 align="middle">
                 Part 6: "Level sampling" with mipmaps for texture mapping
             </h3>
+            <p>
+                Explain level sampling in your own words and describe how you
+                implemented it for texture mapping Level sampling utilizes
+                "mipmaps" of an input image in order to better approximate the
+                screen sampling rate. A mipmap contains recursively low-pass
+                filtered and downsampled copies of the original image.
+            </p>
         </div>
     </body>
 </html>
