@@ -32,7 +32,7 @@
         ></script>
     </head>
 
-    <body>
+    <body style="background-color: slategray">
         <h1 align="middle">
             CS 184/284A: Computer Graphics and Imaging, Spring 2024
         </h1>
@@ -44,10 +44,11 @@
         <div>
             <h2 align="middle">Overview</h2>
             <p>
-                Give a high-level overview of what you implemented in this
-                homework Think about what you've built as a whole. Share your
-                thoughts on what interesting things you've learned from
-                completing the homework.
+                In the homework assignment we implemented a triangle rasterizer
+                with many antialiasing techniques described in lecture in order
+                to improve the quality of our output images. In order to
+                correctly implement the technniques described in class, it was
+                necesasry for us to understand the concepts
             </p>
 
             <h2 align="middle">Section I: Rasterization</h2>
@@ -170,7 +171,6 @@
                         align="middle"
                         width="800px"
                     />
-                    <figcaption align="middle">Robot.</figcaption>
                 </figure>
             </div>
             <p>
@@ -190,6 +190,17 @@
                 at vertices. If each vertex of the triangle and the color at
                 those vertices are given, we can interpolate the color of the
                 entire triangle with barycentric coordinates.
+            </p>
+            <div style="display: flex; justify-content: center">
+                <figure>
+                    <img src="./img/tri.png" align="middle" width="400px" />
+                </figure>
+            </div>
+            <p>
+                The triangle above (taken from lecture slides) shows how through
+                the use of barycentric coordinates, we can interpolate a color
+                from any point within the triangle just by knowing the the
+                colors at the vertices.
             </p>
             <div style="display: flex; justify-content: center">
                 <figure>
@@ -313,12 +324,95 @@
                 Part 6: "Level sampling" with mipmaps for texture mapping
             </h3>
             <p>
-                Explain level sampling in your own words and describe how you
-                implemented it for texture mapping Level sampling utilizes
-                "mipmaps" of an input image in order to better approximate the
-                screen sampling rate. A mipmap contains recursively low-pass
-                filtered and downsampled copies of the original image.
+                Level sampling utilizes "mipmaps" of an input image in order to
+                better approximate the screen sampling rate. A mipmap contains
+                recursively low-pass filtered and downsampled copies of the
+                original image. Then, for each sample we can then choose a texel
+                from the "best-fitting" image within the mipmap to contribute to
+                the output.
             </p>
+            <p>
+                Between pixel sampling methods, bilinear interpolation is
+                definitely more computationally intensive than nearest neighbor,
+                since 4 array accesses and additional computations are necessary
+                instead of just retrieving a single value.
+            </p>
+            <p>
+                For level sampling methods, zero sampling is the cheapest since
+                there is no computation done to determine which level of the
+                mipmap to sample from. Nearest level sampling requires some more
+                computation to determine the mipmap level, namely two extra
+                barycentric coordinate computations (for the \((x+1, y)\) and
+                \((x, y+1)\) coordinates). Finally, linear level sampling
+                includes all of the previous computations, and an additional
+                interpolation step in order to create the final color.
+            </p>
+            <div align="middle">
+              <table style="width: 100%">
+                  <tr>
+                      <td>
+                          <div style="display: flex; justify-content: center">
+                              <figure>
+                                  <img
+                                      src="./img/task6-1.png"
+                                      align="middle"
+                                      width="400px"
+                                  />
+                                  <figcaption align="middle">
+                                      Nearest level, nearest pixel.
+                                  </figcaption>
+                              </figure>
+                          </div>
+                      </td>
+                      <td>
+                          <div style="display: flex; justify-content: center">
+                              <figure>
+                                  <img
+                                      src="./img/task6-2.png"
+                                      align="middle"
+                                      width="400px"
+                                  />
+                                  <figcaption align="middle">
+                                      Level 0, bilinear pixel.
+                                  </figcaption>
+                              </figure>
+                          </div>
+                      </td>
+                  </tr>
+                  <br />
+                  <tr>
+                      <td>
+                          <div style="display: flex; justify-content: center">
+                              <figure>
+                                  <img
+                                      src="./img/task6-3.png"
+                                      align="middle"
+                                      width="400px"
+                                  />
+                                  <figcaption align="middle">
+                                      Nearest level, bilinear pixel.
+                                  </figcaption>
+                              </figure>
+                          </div>
+                      </td>
+                      <td>
+                          <div style="display: flex; justify-content: center">
+                              <figure>
+                                  <img
+                                      src="./img/task6-4.png"
+                                      align="middle"
+                                      width="400px"
+                                  />
+                                  <figcaption align="middle">
+                                      Trilinear.
+                                  </figcaption>
+                              </figure>
+                          </div>
+                      </td>
+                  </tr>
+              </table>
+          </div>
+
         </div>
     </body>
 </html>
