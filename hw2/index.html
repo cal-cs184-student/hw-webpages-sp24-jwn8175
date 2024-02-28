@@ -1,7 +1,541 @@
-<html>
-	<head>
-	</head>
-	<body>
-		Homework 2 index.html here
-	</body>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+    <head>
+        <style>
+            body {
+                padding: 100px;
+                width: 1000px;
+                margin: auto;
+                text-align: left;
+                font-weight: 300;
+                font-family: "Open Sans", sans-serif;
+                color: #121212;
+            }
+            h1,
+            h2,
+            h3,
+            h4 {
+                font-family: "Source Sans Pro", sans-serif;
+                text-align: center;
+            }
+            figcaption {
+                align-self: center;
+            }
+        </style>
+        <title>CS 184/284A MeshEdit</title>
+        <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+        <link
+            href="https://fonts.googleapis.com/css?family=Open+Sans|Source+Sans+Pro"
+            rel="stylesheet"
+        />
+        <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+        <script
+            id="MathJax-script"
+            async
+            src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"
+        ></script>
+    </head>
+
+    <body style="background-color: slategray">
+        <h1>CS 184/284A: Computer Graphics and Imaging, Spring 2024</h1>
+        <h1>Homework 2: MeshEdit</h1>
+        <h2>Jay Ni and Karen Li</h2>
+
+        <br /><br />
+
+        <div>
+            <h2>Overview</h2>
+            <p>
+                In the first section of this homework, we interacted with Bezier
+                curves and surfaces, implementing the recursive de Casteljau
+                subdivision algorithm. In the second section of this homework,
+                we worked extensively with the halfedge mesh data structure,
+                implementing two local edge operations flip and split, as well
+                as a global loop subdivision algorithm. By becoming so familiar
+                with the halfedge mesh data structure, we came to appreciate how
+                useful this form of representing a mesh is. Being able to see
+                how our code affected the mesh step by step was very interesting
+                as well.
+            </p>
+
+            <h2>Section I: Bezier Curves and Surfaces</h2>
+
+            <h3>Part 1: Bezier Curves with 1D de Casteljau Subdivision</h3>
+            <p>
+                Given a vector of \(n\) points, we can compute the \(n-1\)
+                control points in the next step of the de Casteljau algorithm by
+                looping through each current point \(i\) and interpolate with
+                the next point \(i + 1\) and parameter \(t\). We stop at the
+                \(i-1\)th point to avoid going out of bounds. If the input
+                vector has only one point, just return without any computation.
+                This serves as our base case.
+            </p>
+            <div style="display: flex; justify-content: center">
+                <table style="width: 100%">
+                    <tr>
+                        <td>
+                            <div style="display: flex; justify-content: center">
+                                <figure>
+                                    <img
+                                        src="./img/task1-0.png"
+                                        align="middle"
+                                        width="400px"
+                                    />
+                                </figure>
+                            </div>
+                        </td>
+                        <td>
+                            <div style="display: flex; justify-content: center">
+                                <figure>
+                                    <img
+                                        src="./img/task1-1.png"
+                                        align="middle"
+                                        width="400px"
+                                    />
+                                </figure>
+                            </div>
+                        </td>
+                    </tr>
+                    <br />
+                    <tr>
+                        <td>
+                            <div style="display: flex; justify-content: center">
+                                <figure>
+                                    <img
+                                        src="./img/task1-2.png"
+                                        align="middle"
+                                        width="400px"
+                                    />
+                                </figure>
+                            </div>
+                        </td>
+                        <td>
+                            <div style="display: flex; justify-content: center">
+                                <figure>
+                                    <img
+                                        src="./img/task1-3.png"
+                                        align="middle"
+                                        width="400px"
+                                    />
+                                </figure>
+                            </div>
+                        </td>
+                    </tr>
+                    <br />
+                    <tr>
+                        <td>
+                            <div style="display: flex; justify-content: center">
+                                <figure>
+                                    <img
+                                        src="./img/task1-4.png"
+                                        align="middle"
+                                        width="400px"
+                                    />
+                                </figure>
+                            </div>
+                        </td>
+                        <td>
+                            <div style="display: flex; justify-content: center">
+                                <figure>
+                                    <img
+                                        src="./img/task1-5.png"
+                                        align="middle"
+                                        width="400px"
+                                    />
+                                </figure>
+                            </div>
+                        </td>
+                    </tr>
+                    <br />
+                    <tr>
+                        <td style="justify-content: center">
+                            <div style="display: flex; justify-content: center">
+                                <figure>
+                                    <img
+                                        src="./img/task1-final.png"
+                                        align="middle"
+                                        width="400px"
+                                    />
+                                    <figcaption align="middle">
+                                        Final evaluated curve.
+                                    </figcaption>
+                                </figure>
+                            </div>
+                        </td>
+                        <td style="justify-content: center">
+                            <div style="display: flex; justify-content: center">
+                                <figure>
+                                    <img
+                                        src="./img/task1-weird.png"
+                                        align="middle"
+                                        width="400px"
+                                    />
+                                    <figcaption align="middle">
+                                        Curve with adjusted control points and
+                                        \(t\).
+                                    </figcaption>
+                                </figure>
+                            </div>
+                        </td>
+                    </tr>
+                    <br />
+                </table>
+            </div>
+
+            <h3>Part 2: Bezier Surfaces with Separable 1D de Casteljau</h3>
+            <p>
+                We implemented this part very similarly to part 1. The
+                computation for the recursive step is identical, except with 3D
+                vectors instead of 2D. For each row in the given patch of
+                control points, we use the recursive algorithm until there is
+                one single point remaining per row. Then we take all of these
+                points and interpolate again, ultimately ending up with a single
+                control point.
+            </p>
+            <div style="display: flex; justify-content: center">
+                <figure>
+                    <img
+                        src="./img/task2-teapot-bez.png"
+                        align="middle"
+                        width="400px"
+                    />
+                    <figcaption align="middle">
+                        Teapot evaluated with our implementation.
+                    </figcaption>
+                </figure>
+            </div>
+
+            <h2>Section II: Triangle Meshes and Half-Edge Data Structure</h2>
+
+            <h3>Part 3: Area-Weighted Vertex Normals</h3>
+            <p>
+                In order to get all the neighboring triangles, we first loop
+                through all the neighboring vertices. Since the current vertex
+                is part of all of the triangles, we then loop through the
+                vertices two at a time to get the three vertices forming each
+                triangle. Using the triangle's vertices, we used vector geometry
+                to calculate the area, keeping track of the total area in order
+                to calculate the area-weighted normals. We get the normal for
+                each triangle by calculating the cross product using two of the
+                edges on the triangle and keep track of it in a list of normals.
+                Finally, we add the normals and divide by the total area to get
+                the final unit normal.
+            </p>
+            <div align="middle">
+                <table style="width: 100%">
+                    <tr>
+                        <td>
+                            <div style="display: flex; justify-content: center">
+                                <figure>
+                                    <img
+                                        src="./img/task3-unshaded.png"
+                                        align="middle"
+                                        width="400px"
+                                    />
+                                    <figcaption align="middle">
+                                        Teapot shading without vertex normals.
+                                    </figcaption>
+                                </figure>
+                            </div>
+                        </td>
+                        <td>
+                            <div style="display: flex; justify-content: center">
+                                <figure>
+                                    <img
+                                        src="./img/task3-teapot-shaded.png"
+                                        align="middle"
+                                        width="400px"
+                                    />
+                                    <figcaption align="middle">
+                                        Teapot shading with vertex normals.
+                                    </figcaption>
+                                </figure>
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+
+            <h3>Part 4: Edge Flip</h3>
+            <p>
+                To implement the edge flip operation, we first created variables
+                for all elements in the mesh (half-edges, vertices, edges,
+                faces). Then, we made the updates by first reassigning the next,
+                twin, vertex, edge, and face pointers for each half-edge and
+                then updating the vertices, edges, and faces accordingly. We
+                initially had the problem of the program running forever without
+                terminating when we tried to flip an edge. This issue was
+                resolved by checking the reassignments.
+            </p>
+            <div style="display: flex; justify-content: center">
+                <figure>
+                    <img
+                        src="./img/task6-teapot-jagged.png"
+                        align="middle"
+                        width="400px"
+                    />
+                    <figcaption align="middle">
+                        Teapot with no changes.
+                    </figcaption>
+                </figure>
+            </div>
+            <div align="middle">
+                <table style="width: 100%">
+                    <tr>
+                        <td>
+                            <div style="display: flex; justify-content: center">
+                                <figure>
+                                    <img
+                                        src="./img/task4-teapot-flip1.png"
+                                        align="middle"
+                                        width="400px"
+                                    />
+                                    <figcaption align="middle">
+                                        Teapot with some flips.
+                                    </figcaption>
+                                </figure>
+                            </div>
+                        </td>
+                        <td>
+                            <div style="display: flex; justify-content: center">
+                                <figure>
+                                    <img
+                                        src="./img/task4-teapot-flip2.png"
+                                        align="middle"
+                                        width="400px"
+                                    />
+                                    <figcaption align="middle">
+                                        Teapot with many flips.
+                                    </figcaption>
+                                </figure>
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+
+            <h3>Part 5: Edge Split</h3>
+            <p>
+                Implementing the edge split operation was very similar to the
+                edge flip operation, except new halfedges, edges, faces, and a
+                vertex needed to be added to the data structure. This was done
+                through the use of the <code>new*</code> functions provided.
+                When an edge is split, it turns into four edges. Instead of
+                removing the original edge from the mesh and added four new
+                edges, we instead only added three new edges and reassigned
+                values to the passed-in edge to avoid mutating the mesh elements
+                as much as possible. By drawing out a before vs. after diagram
+                by hand and then carefully following said diagram while
+                reassigning pointers, we were able to ensure that there were no
+                major errors.
+            </p>
+
+            <div align="middle">
+                <table style="width: 100%">
+                    <tr>
+                        <td>
+                            <div style="display: flex; justify-content: center">
+                                <figure>
+                                    <img
+                                        src="./img/task6-cube.png"
+                                        align="middle"
+                                        width="400px"
+                                    />
+                                    <figcaption align="middle">
+                                        Cube with no splits or flips.
+                                    </figcaption>
+                                </figure>
+                            </div>
+                        </td>
+                        <td>
+                            <div style="display: flex; justify-content: center">
+                                <figure>
+                                    <img
+                                        src="./img/task5-cube-split.png"
+                                        align="middle"
+                                        width="400px"
+                                    />
+                                    <figcaption align="middle">
+                                        Cube with splits.
+                                    </figcaption>
+                                </figure>
+                            </div>
+                        </td>
+                    </tr>
+                    <br />
+                    <tr>
+                        <td>
+                            <div style="display: flex; justify-content: center">
+                                <figure>
+                                    <img
+                                        src="./img/task5-cube-split-flip.png"
+                                        align="middle"
+                                        width="400px"
+                                    />
+                                    <figcaption align="middle">
+                                        Cube with splits and flips.
+                                    </figcaption>
+                                </figure>
+                            </div>
+                        </td>
+                        <td>
+                            <div style="display: flex; justify-content: center">
+                                <figure>
+                                    <img
+                                        src="./img/task5-teapot-split-flip.png"
+                                        align="middle"
+                                        width="400px"
+                                    />
+                                    <figcaption align="middle">
+                                        Teapot with many splits and flips.
+                                    </figcaption>
+                                </figure>
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+
+            <h3>Part 6: Loop Subdivision for Mesh Upsampling</h3>
+            <p>
+                To implement loop subdivision, we followed the recommended steps
+                provided in the spec.
+            </p>
+            <p>
+                First we computed new positions for all vertices already within
+                the mesh using the loop subdivision rule and stored these values
+                in <code>Vertex::newPosition</code> for later use. We also set
+                <code>Vertex::isNew</code> to <code>false</code> for all of
+                these values.
+            </p>
+            <p>
+                Then, we computed the new positions for each new vertex that
+                will be created via edge splitting, and stored these values in
+                <code>Edge::newPosition</code>. We also set both
+                <code>Edge::isNew</code> and <code>Edge::isSplit</code> to
+                <code>false</code>.
+            </p>
+            <p>
+                Now we split every edge in the vertex that has not already been
+                apart of a split operation (the edge split function sets the
+                <code>Edge::isSplit</code> value in the two edges that make up
+                the original edge passed in to <code>true</code>.) We also use
+                the values computed in step 2 to set the position of these newly
+                created vertices.
+            </p>
+            <p>
+                Finally, we flip every newly created edge that connected a new
+                vertex and an old vertex, and update all vertex positions to
+                their new values.
+            </p>
+            <p>
+                Including the new member variable <code>Edge::isSplit</code> was
+                the most crucial step in ensuring that there will not be an
+                infinite loop when trying to split edges in the mesh.
+            </p>
+            <div align="middle">
+                <table style="width: 100%">
+                    <tr>
+                        <td>
+                            <div style="display: flex; justify-content: center">
+                                <figure>
+                                    <img
+                                        src="./img/task6-teapot-jagged.png"
+                                        align="middle"
+                                        width="400px"
+                                    />
+                                    <figcaption align="middle">
+                                        Teapot with no upsampling.
+                                    </figcaption>
+                                </figure>
+                            </div>
+                        </td>
+                        <td>
+                            <div style="display: flex; justify-content: center">
+                                <figure>
+                                    <img
+                                        src="./img/task6-teapot-smooth.png"
+                                        align="middle"
+                                        width="400px"
+                                    />
+                                    <figcaption align="middle">
+                                        Teapot with upsampling.
+                                    </figcaption>
+                                </figure>
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            <p>
+                Above we can see that prior to upsampling, the edges of the
+                teapot, especially around the rim where the lid, are fairly
+                jagged. However, after upsampling a few times, the edges look
+                significantly smoother. The cube images shown in the next
+                section also illustrate this effect.
+            </p>
+            <div align="middle">
+                <table style="width: 100%">
+                    <tr>
+                        <td>
+                            <div style="display: flex; justify-content: center">
+                                <figure>
+                                    <img
+                                        src="./img/task6-cube.png"
+                                        align="middle"
+                                        width="400px"
+                                    />
+                                    <figcaption align="middle">
+                                        Cube with no upsampling.
+                                    </figcaption>
+                                </figure>
+                            </div>
+                        </td>
+                        <td>
+                            <div style="display: flex; justify-content: center">
+                                <figure>
+                                    <img
+                                        src="./img/task6-cube-deformed.png"
+                                        align="middle"
+                                        width="400px"
+                                    />
+                                    <figcaption align="middle">
+                                        Cube upsampled without preprocessing.
+                                    </figcaption>
+                                </figure>
+                            </div>
+                        </td>
+                    </tr>
+                    <br />
+                    <tr>
+                        <td>
+                            <div style="display: flex; justify-content: center">
+                                <figure>
+                                    <img
+                                        src="./img/task6-cube-even.png"
+                                        align="middle"
+                                        width="400px"
+                                    />
+                                    <figcaption align="middle">
+                                        Cube upsampled with all slides split
+                                        into four triangles.
+                                    </figcaption>
+                                </figure>
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            <p>
+                Above we can see that the cube, when upsampled several times,
+                becomes slightly asymmetric. This is because the original cube
+                has two triangles per face, which results in each face
+                "pointing" towards a specific direction when upsampling. To make
+                the cube upsample more evenly, we split each face into four
+                triangles before upsampling. This result is shown in the bottom
+                left image. The cube is now much more symmetrical due each face
+                start more "even".
+            </p>
+        </div>
+    </body>
 </html>
