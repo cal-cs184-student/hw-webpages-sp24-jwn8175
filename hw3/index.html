@@ -46,9 +46,8 @@
             intersections and utilized direct and indirect lighting to generate the images and observed how different
             methods changed the rendering of the images. Our approach was to look at the lecture slides on the concepts
             we were applying and understand conceptually before implementing them in code. We encountered some problems
-            with the <code>bbox::intersect</code> method, which we were able to debug, and implementing adaptive
-            sampling, which we
-            explain in more detail in Part 5. Overall, this was a very enlightening (haha) project!
+            with the <code>bbox::intersect</code> method and implementing adaptive sampling, which we were able to
+            debug. Overall, this was a very enlightening (haha) project!
         </p>
 
         <h2>Part I: Ray Generation and Scene Intersection</h2>
@@ -119,14 +118,14 @@
                     <td>
                         <div style="display: flex; justify-content: center">
                             <figure>
-                                <img src="./img/part1/empty_normal.png" align="middle" width="400px" />
+                                <img src="./img/part1/empty_normal.png" width="400px" />
                             </figure>
                         </div>
                     </td>
                     <td>
                         <div style="display: flex; justify-content: center">
                             <figure>
-                                <img src="./img/part1/spheres_normal.png" align="middle" width="400px" />
+                                <img src="./img/part1/spheres_normal.png" width="400px" />
                             </figure>
                         </div>
                     </td>
@@ -136,14 +135,14 @@
                     <td>
                         <div style="display: flex; justify-content: center">
                             <figure>
-                                <img src="./img/part1/cow.png" align="middle" width="400px" />
+                                <img src="./img/part1/cow.png" width="400px" />
                             </figure>
                         </div>
                     </td>
                     <td>
                         <div style="display: flex; justify-content: center">
                             <figure>
-                                <img src="./img/part1/teapot.png" align="middle" width="400px" />
+                                <img src="./img/part1/teapot.png" width="400px" />
                             </figure>
                         </div>
                     </td>
@@ -182,14 +181,14 @@
                     <td>
                         <div style="display: flex; justify-content: center">
                             <figure>
-                                <img src="./img/part2/pt2_lucy.png" align="middle" width="400px" />
+                                <img src="./img/part2/pt2_lucy.png" width="400px" />
                             </figure>
                         </div>
                     </td>
                     <td>
                         <div style="display: flex; justify-content: center">
                             <figure>
-                                <img src="./img/part2/pt2_dragon.png" align="middle" width="400px" />
+                                <img src="./img/part2/pt2_dragon.png" width="400px" />
                             </figure>
                         </div>
                     </td>
@@ -199,14 +198,14 @@
                     <td>
                         <div style="display: flex; justify-content: center">
                             <figure>
-                                <img src="./img/part2/pt2_maxplanck.png" align="middle" width="400px" />
+                                <img src="./img/part2/pt2_maxplanck.png" width="400px" />
                             </figure>
                         </div>
                     </td>
                     <td>
                         <div style="display: flex; justify-content: center">
                             <figure>
-                                <img src="./img/part2/pt2_walle.png" align="middle" width="400px" />
+                                <img src="./img/part2/pt2_walle.png" width="400px" />
                             </figure>
                         </div>
                     </td>
@@ -263,7 +262,7 @@
                     <td>
                         <div style="display: flex; justify-content: center">
                             <figure>
-                                <img src="./img/part3/bunny_uniform.png" align="middle" width="400px" />
+                                <img src="./img/part3/bunny_uniform.png" width="400px" />
                                 <figcaption>Bunny with Uniform Hemisphere Sampling</figcaption>
                             </figure>
                         </div>
@@ -271,7 +270,7 @@
                     <td>
                         <div style="display: flex; justify-content: center">
                             <figure>
-                                <img src="./img/part3/bunny_importance.png" align="middle" width="400px" />
+                                <img src="./img/part3/bunny_importance.png" width="400px" />
                                 <figcaption>Bunny with Importance Sampling</figcaption>
                             </figure>
                         </div>
@@ -282,7 +281,7 @@
                     <td>
                         <div style="display: flex; justify-content: center">
                             <figure>
-                                <img src="./img/part3/spheres_uniform.png" align="middle" width="400px" />
+                                <img src="./img/part3/spheres_uniform.png" width="400px" />
                                 <figcaption>Spheres with Uniform Hemisphere Sampling</figcaption>
                             </figure>
                         </div>
@@ -290,7 +289,7 @@
                     <td>
                         <div style="display: flex; justify-content: center">
                             <figure>
-                                <img src="./img/part3/spheres_importance.png" align="middle" width="400px" />
+                                <img src="./img/part3/spheres_importance.png" width="400px" />
                                 <figcaption>Spheres with Importance Sampling</figcaption>
                             </figure>
                         </div>
@@ -312,7 +311,7 @@
                     <td>
                         <div style="display: flex; justify-content: center">
                             <figure>
-                                <img src="./img/part3/spheres_importance_1.png" align="middle" width="400px" />
+                                <img src="./img/part3/spheres_importance_1.png" width="400px" />
                                 <figcaption>1 Sample per Area Light</figcaption>
                             </figure>
                         </div>
@@ -320,7 +319,7 @@
                     <td>
                         <div style="display: flex; justify-content: center">
                             <figure>
-                                <img src="./img/part3/spheres_importance_4.png" align="middle" width="400px" />
+                                <img src="./img/part3/spheres_importance_4.png" width="400px" />
                                 <figcaption>4 Samples per Area Light</figcaption>
                             </figure>
                         </div>
@@ -331,7 +330,7 @@
                     <td>
                         <div style="display: flex; justify-content: center">
                             <figure>
-                                <img src="./img/part3/spheres_importance_16.png" align="middle" width="400px" />
+                                <img src="./img/part3/spheres_importance_16.png" width="400px" />
                                 <figcaption>16 Samples per Area Light</figcaption>
                             </figure>
                         </div>
@@ -339,7 +338,7 @@
                     <td>
                         <div style="display: flex; justify-content: center">
                             <figure>
-                                <img src="./img/part3/spheres_importance_64.png" align="middle" width="400px" />
+                                <img src="./img/part3/spheres_importance_64.png" width="400px" />
                                 <figcaption>64 Samples per Area Light</figcaption>
                             </figure>
                         </div>
@@ -382,14 +381,14 @@
                     <td>
                         <div style="display: flex; justify-content: center">
                             <figure>
-                                <img src="./img/part4/walle_s1024.png" align="middle" width="400px" />
+                                <img src="./img/part4/walle_s1024.png" width="400px" />
                             </figure>
                         </div>
                     </td>
                     <td>
                         <div style="display: flex; justify-content: center">
                             <figure>
-                                <img src="./img/part4/bench_s1024.png" align="middle" width="400px" />
+                                <img src="./img/part4/bench_s1024.png" width="400px" />
                             </figure>
                         </div>
                     </td>
@@ -399,14 +398,14 @@
                     <td>
                         <div style="display: flex; justify-content: center">
                             <figure>
-                                <img src="./img/part4/blob_s1024.png" align="middle" width="400px" />
+                                <img src="./img/part4/blob_s1024.png" width="400px" />
                             </figure>
                         </div>
                     </td>
                     <td>
                         <div style="display: flex; justify-content: center">
                             <figure>
-                                <img src="./img/part4/dragon_s1024.png" align="middle" width="400px" />
+                                <img src="./img/part4/dragon_s1024.png" width="400px" />
                             </figure>
                         </div>
                     </td>
@@ -422,7 +421,7 @@
                     <td>
                         <div style="display: flex; justify-content: center">
                             <figure>
-                                <img src="./img/part4/spheres_direct.png" align="middle" width="400px" />
+                                <img src="./img/part4/spheres_direct.png" width="400px" />
                                 <figcaption>Spheres rendered with direct illumination</figcaption>
                             </figure>
                         </div>
@@ -430,7 +429,7 @@
                     <td>
                         <div style="display: flex; justify-content: center">
                             <figure>
-                                <img src="./img/part4/spheres_indirect.png" align="middle" width="400px" />
+                                <img src="./img/part4/spheres_indirect.png" width="400px" />
                                 <figcaption>Spheres rendered with indirect illumination</figcaption>
                             </figure>
                         </div>
@@ -454,7 +453,7 @@
                     <td>
                         <div style="display: flex; justify-content: center">
                             <figure>
-                                <img src="./img/part4/bunny_bounce_0.png" align="middle" width="400px" />
+                                <img src="./img/part4/bunny_bounce_0.png" width="400px" />
                                 <figcaption><code>-m = 0</code></figcaption>
                             </figure>
                         </div>
@@ -462,7 +461,7 @@
                     <td>
                         <div style="display: flex; justify-content: center">
                             <figure>
-                                <img src="./img/part4/bunny_bounce_1.png" align="middle" width="400px" />
+                                <img src="./img/part4/bunny_bounce_1.png" width="400px" />
                                 <figcaption><code>-m = 1</code></figcaption>
                             </figure>
                         </div>
@@ -473,7 +472,7 @@
                     <td>
                         <div style="display: flex; justify-content: center">
                             <figure>
-                                <img src="./img/part4/bunny_bounce_2.png" align="middle" width="400px" />
+                                <img src="./img/part4/bunny_bounce_2.png" width="400px" />
                                 <figcaption><code>-m = 2</code></figcaption>
                             </figure>
                         </div>
@@ -481,7 +480,7 @@
                     <td>
                         <div style="display: flex; justify-content: center">
                             <figure>
-                                <img src="./img/part4/bunny_bounce_3.png" align="middle" width="400px" />
+                                <img src="./img/part4/bunny_bounce_3.png" width="400px" />
                                 <figcaption><code>-m = 3</code></figcaption>
                             </figure>
                         </div>
@@ -492,7 +491,7 @@
                     <td>
                         <div style="display: flex; justify-content: center">
                             <figure>
-                                <img src="./img/part4/bunny_bounce_4.png" align="middle" width="400px" />
+                                <img src="./img/part4/bunny_bounce_4.png" width="400px" />
                                 <figcaption><code>-m = 4</code></figcaption>
                             </figure>
                         </div>
@@ -500,7 +499,7 @@
                     <td>
                         <div style="display: flex; justify-content: center">
                             <figure>
-                                <img src="./img/part4/bunny_bounce_5.png" align="middle" width="400px" />
+                                <img src="./img/part4/bunny_bounce_5.png" width="400px" />
                                 <figcaption><code>-m = 5</code></figcaption>
                             </figure>
                         </div>
@@ -520,7 +519,7 @@
                     <td>
                         <div style="display: flex; justify-content: center">
                             <figure>
-                                <img src="./img/part4/bunny_accum_0.png" align="middle" width="400px" />
+                                <img src="./img/part4/bunny_accum_0.png" width="400px" />
                                 <figcaption><code>-m = 0</code></figcaption>
                             </figure>
                         </div>
@@ -528,7 +527,7 @@
                     <td>
                         <div style="display: flex; justify-content: center">
                             <figure>
-                                <img src="./img/part4/bunny_accum_1.png" align="middle" width="400px" />
+                                <img src="./img/part4/bunny_accum_1.png" width="400px" />
                                 <figcaption><code>-m = 1</code></figcaption>
                             </figure>
                         </div>
@@ -539,7 +538,7 @@
                     <td>
                         <div style="display: flex; justify-content: center">
                             <figure>
-                                <img src="./img/part4/bunny_accum_2.png" align="middle" width="400px" />
+                                <img src="./img/part4/bunny_accum_2.png" width="400px" />
                                 <figcaption><code>-m = 2</code></figcaption>
                             </figure>
                         </div>
@@ -547,7 +546,7 @@
                     <td>
                         <div style="display: flex; justify-content: center">
                             <figure>
-                                <img src="./img/part4/bunny_accum_3.png" align="middle" width="400px" />
+                                <img src="./img/part4/bunny_accum_3.png" width="400px" />
                                 <figcaption><code>-m = 3</code></figcaption>
                             </figure>
                         </div>
@@ -558,7 +557,7 @@
                     <td>
                         <div style="display: flex; justify-content: center">
                             <figure>
-                                <img src="./img/part4/bunny_accum_4.png" align="middle" width="400px" />
+                                <img src="./img/part4/bunny_accum_4.png" width="400px" />
                                 <figcaption><code>-m = 4</code></figcaption>
                             </figure>
                         </div>
@@ -566,7 +565,7 @@
                     <td>
                         <div style="display: flex; justify-content: center">
                             <figure>
-                                <img src="./img/part4/bunny_accum_5.png" align="middle" width="400px" />
+                                <img src="./img/part4/bunny_accum_5.png" width="400px" />
                                 <figcaption><code>-m = 5</code></figcaption>
                             </figure>
                         </div>
@@ -584,7 +583,7 @@
                     <td>
                         <div style="display: flex; justify-content: center">
                             <figure>
-                                <img src="./img/part4/bunny_accum_0.png" align="middle" width="400px" />
+                                <img src="./img/part4/bunny_accum_0.png" width="400px" />
                                 <figcaption><code>-m = 0</code></figcaption>
                             </figure>
                         </div>
@@ -592,7 +591,7 @@
                     <td>
                         <div style="display: flex; justify-content: center">
                             <figure>
-                                <img src="./img/part4/bunny_rr_1.png" align="middle" width="400px" />
+                                <img src="./img/part4/bunny_rr_1.png" width="400px" />
                                 <figcaption><code>-m = 1</code></figcaption>
                             </figure>
                         </div>
@@ -603,7 +602,7 @@
                     <td>
                         <div style="display: flex; justify-content: center">
                             <figure>
-                                <img src="./img/part4/bunny_rr_2.png" align="middle" width="400px" />
+                                <img src="./img/part4/bunny_rr_2.png" width="400px" />
                                 <figcaption><code>-m = 2</code></figcaption>
                             </figure>
                         </div>
@@ -611,7 +610,7 @@
                     <td>
                         <div style="display: flex; justify-content: center">
                             <figure>
-                                <img src="./img/part4/bunny_rr_3.png" align="middle" width="400px" />
+                                <img src="./img/part4/bunny_rr_3.png" width="400px" />
                                 <figcaption><code>-m = 3</code></figcaption>
                             </figure>
                         </div>
@@ -622,7 +621,7 @@
                     <td>
                         <div style="display: flex; justify-content: center">
                             <figure>
-                                <img src="./img/part4/bunny_rr_4.png" align="middle" width="400px" />
+                                <img src="./img/part4/bunny_rr_4.png" width="400px" />
                                 <figcaption><code>-m = 4</code></figcaption>
                             </figure>
                         </div>
@@ -630,7 +629,7 @@
                     <td>
                         <div style="display: flex; justify-content: center">
                             <figure>
-                                <img src="./img/part4/bunny_rr_100.png" align="middle" width="400px" />
+                                <img src="./img/part4/bunny_rr_100.png" width="400px" />
                                 <figcaption><code>-m = 100</code></figcaption>
                             </figure>
                         </div>
@@ -648,7 +647,7 @@
                     <td>
                         <div style="display: flex; justify-content: center">
                             <figure>
-                                <img src="./img/part4/spheres_s1.png" align="middle" width="400px" />
+                                <img src="./img/part4/spheres_s1.png" width="400px" />
                                 <figcaption><code>-s = 1</code></figcaption>
                             </figure>
                         </div>
@@ -656,7 +655,7 @@
                     <td>
                         <div style="display: flex; justify-content: center">
                             <figure>
-                                <img src="./img/part4/spheres_s2.png" align="middle" width="400px" />
+                                <img src="./img/part4/spheres_s2.png" width="400px" />
                                 <figcaption><code>-s = 2</code></figcaption>
                             </figure>
                         </div>
@@ -667,7 +666,7 @@
                     <td>
                         <div style="display: flex; justify-content: center">
                             <figure>
-                                <img src="./img/part4/spheres_s4.png" align="middle" width="400px" />
+                                <img src="./img/part4/spheres_s4.png" width="400px" />
                                 <figcaption><code>-s = 4</code></figcaption>
                             </figure>
                         </div>
@@ -675,7 +674,7 @@
                     <td>
                         <div style="display: flex; justify-content: center">
                             <figure>
-                                <img src="./img/part4/spheres_s8.png" align="middle" width="400px" />
+                                <img src="./img/part4/spheres_s8.png" width="400px" />
                                 <figcaption><code>-s = 8</code></figcaption>
                             </figure>
                         </div>
@@ -686,7 +685,7 @@
                     <td>
                         <div style="display: flex; justify-content: center">
                             <figure>
-                                <img src="./img/part4/spheres_s16.png" align="middle" width="400px" />
+                                <img src="./img/part4/spheres_s16.png" width="400px" />
                                 <figcaption><code>-s = 16</code></figcaption>
                             </figure>
                         </div>
@@ -694,7 +693,7 @@
                     <td>
                         <div style="display: flex; justify-content: center">
                             <figure>
-                                <img src="./img/part4/spheres_s64.png" align="middle" width="400px" />
+                                <img src="./img/part4/spheres_s64.png" width="400px" />
                                 <figcaption><code>-s = 64</code></figcaption>
                             </figure>
                         </div>
@@ -705,7 +704,7 @@
         </div>
         <div style="display: flex; justify-content: center">
             <figure>
-                <img src="./img/part4/spheres_s1024.png" align="middle" width="400px" />
+                <img src="./img/part4/spheres_s1024.png" width="400px" />
                 <figcaption><code>-s = 1024</code></figcaption>
             </figure>
         </div>
@@ -732,14 +731,7 @@
             terminating.
         </p>
         <p>
-            Unfortunately, we were not able correctly implement adaptive sampling. Below is a comparison of the same
-            image rendered with and without adaptive sampling. It is very clear that the image with adaptive sampling is
-            much noisier than the one without, even in areas where there should have been many iterations of the
-            sampling loop before convergence. We identified the problem which is each pixel value converges immediately
-            after the first time we check for termination (after 64 samples in this case). The rate image reflects this
-            by being entirely blue. So we effectively have an image with the pixel sample rate as 64 instead of the
-            inputted 2048. Despite debugging attempts such as upping the confidence interval from 95% to 98% (1.96
-            to 2.33), we still did not produce any satisfying results.
+            Below are two scenes rendered with adaptive sampling alongside their rate images.
         </p>
         <div style="display: flex; justify-content: center">
             <table style="width: 100%">
@@ -747,28 +739,37 @@
                     <td>
                         <div style="display: flex; justify-content: center">
                             <figure>
-                                <img src="./img/part5/bunny_s2048_adaptive.png" align="middle" width="400px" />
-                                <figcaption>Adaptive sampling</figcaption>
+                                <img src="./img/part5/bunny_adaptive.png" width="400px" />
                             </figure>
                         </div>
                     </td>
                     <td>
                         <div style="display: flex; justify-content: center">
                             <figure>
-                                <img src="./img/part5/bunny_s2048_no_adaptive.png" align="middle" width="400px" />
-                                <figcaption>No adaptive sampling</figcaption>
+                                <img src="./img/part5/bunny_adaptive_rate.png" width="400px" />
+                            </figure>
+                        </div>
+                    </td>
+                </tr>
+                <br />
+                <tr>
+                    <td>
+                        <div style="display: flex; justify-content: center">
+                            <figure>
+                                <img src="./img/part5/spheres_adaptive.png" width="400px" />
+                            </figure>
+                        </div>
+                    </td>
+                    <td>
+                        <div style="display: flex; justify-content: center">
+                            <figure>
+                                <img src="./img/part5/spheres_adaptive_rate.png" width="400px" />
                             </figure>
                         </div>
                     </td>
                 </tr>
                 <br />
             </table>
-        </div>
-        <div style="display: flex; justify-content: center">
-            <figure>
-                <img src="./img/part5/bunny_s2048_adaptive_rate.png" align="middle" width="400px" />
-                <figcaption>Rate image</figcaption>
-            </figure>
         </div>
     </div>
 </body>
