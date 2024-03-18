@@ -1,7 +1,776 @@
-<html>
-	<head>
-	</head>
-	<body>
-		Homework 3 index.html here
-	</body>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+
+<head>
+    <style>
+        body {
+            padding: 100px;
+            width: 1000px;
+            margin: auto;
+            text-align: left;
+            font-weight: 300;
+            font-family: "Open Sans", sans-serif;
+            color: #121212;
+        }
+
+        h1,
+        h2,
+        h3,
+        h4 {
+            font-family: "Source Sans Pro", sans-serif;
+            text-align: center;
+        }
+
+        figcaption {
+            text-align: center;
+        }
+    </style>
+    <title>CS 184/284A Pathtracer</title>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans|Source+Sans+Pro" rel="stylesheet" />
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+</head>
+
+<body style="background-color: slategray">
+    <h1>CS 184/284A: Computer Graphics and Imaging, Spring 2024</h1>
+    <h1>Homework 3: Pathtracer</h1>
+    <h2>Jay Ni and Karen Li</h2>
+
+    <br /><br />
+
+    <div>
+        <h2>Overview</h2>
+        <p>
+            For this project, we rendered images using various path tracing algorithms. We implemented ray-scene
+            intersections and utilized direct and indirect lighting to generate the images and observed how different
+            methods changed the rendering of the images. Our approach was to look at the lecture slides on the concepts
+            we were applying and understand conceptually before implementing them in code. We encountered some problems
+            with the <code>bbox::intersect</code> method, which we were able to debug, and implementing adaptive
+            sampling, which we
+            explain in more detail in Part 5. Overall, this was a very enlightening (haha) project!
+        </p>
+
+        <h2>Part I: Ray Generation and Scene Intersection</h2>
+        <p>
+            In this part we implemented generating rays that will be used to trace through the scene in the later parts.
+            Given some normalized image coordinates, the goal is to convert them into a <code>Ray</code> in world space.
+            First we transformed the image coordiates to camera space. Since we know the bottom left corner of camera
+            space is defined as \(\left( -\tan{\left(\frac{hFov}{2}\right)}, -\tan{\left(\frac{vFov}{2}\right)}, -1
+            \right)\) and the bottom right corner is defined as \(\left( \tan{\left(\frac{hFov}{2}\right)},
+            \tan{\left(\frac{vFov}{2}\right)}, -1 \right)\), we can use these values to scale our normalized image space
+            coordinates accordingly. The 3D vector representing the coordinate in camera space is also the ray direction
+            of the <code>Ray</code> in camera space. To convert the ray direction vector to world space, we multiply it
+            by the camera-to-world transformation matrix. The ray origin in world space is simply the position of the
+            camera. Finally, we initialize the values <code>min_t</code> and <code>max_t</code> of the ray to
+            <code>nClip</code> and <code>fClip</code> to complete ray generation.
+        </p>
+        <p>
+            Given some pixel coordinate \((x, y)\), we need to sample a ray within that pixel. Therefore, we first
+            uniformly sample an offset value between \([0, 1]\) and add it to the given input, before normalizing by the
+            width and height of the framebuffer. This is then passed into the ray generating function defined in the
+            previous paragraph to generate a ray.
+        </p>
+        <p>
+            To detect an intersection between a ray and some triangle primitive in the scene, we implemented the Moller
+            Trumbore algorithm. Given a ray and the vertex coordinates of the triangle <code>p1</code>, <code>p2</code>,
+            <code>p3</code> in the mesh, we can solve for this relationship:
+            $$
+            \textup{Ray}=\vec{O}+t\vec{D}=(1-b_1-b_2)\vec{P_1}+b_2\vec{P_2}+b_3\vec{P_3}
+            $$
+        </p>
+        <p>
+            $$
+            \begin{bmatrix}
+            t \\
+            b_2 \\
+            b_3
+            \end{bmatrix} = \frac{1}{\vec{S_1} \cdot \vec{E_1}}
+            \begin{bmatrix}
+            \vec{S_2} \cdot \vec{E_2} \\
+            \vec{S_1} \cdot \vec{S} \\
+            \vec{S_2} \cdot \vec{D}
+            \end{bmatrix} $$
+        </p>
+        <p>
+            $$ \vec{E_1}=\vec{P_2}-\vec{P_1} $$
+        </p>
+        <p>
+            $$ \vec{E_2}=\vec{P_3}-\vec{P_1} $$
+        </p>
+        <p>
+            $$ \vec{S_1}=\vec{D} \times \vec{E_2} $$
+        </p>
+        <p>
+            $$ \vec{S_2}=\vec{S} \times \vec{E_1} $$
+        </p>
+        <p>
+            First, we must check whether or not the ray is parallal to the plane the triangle lies on. This is done by
+            verifying if <code>dot(s1, e1) == 0</code>. Then, \(b_1\) and
+            \(b_2\) are the Barycentric coordinates of the triangle's vertices. To be valid coefficients, both values
+            must be less than 1 and greater than 0. After getting the value \(t\), we can check if
+            <code>min_t <= t <= max_t</code> to see if the ray intersects the triangle. Finally, we set
+            <code>max_t = t</code> since if a ray intersects with this triangle, it will not continue moving through it.
+        </p>
+        <p>Below are a few images with normal shading after implementing this part.</p>
+        <div style="display: flex; justify-content: center">
+            <table style="width: 100%">
+                <tr>
+                    <td>
+                        <div style="display: flex; justify-content: center">
+                            <figure>
+                                <img src="./img/part1/empty_normal.png" align="middle" width="400px" />
+                            </figure>
+                        </div>
+                    </td>
+                    <td>
+                        <div style="display: flex; justify-content: center">
+                            <figure>
+                                <img src="./img/part1/spheres_normal.png" align="middle" width="400px" />
+                            </figure>
+                        </div>
+                    </td>
+                </tr>
+                <br />
+                <tr>
+                    <td>
+                        <div style="display: flex; justify-content: center">
+                            <figure>
+                                <img src="./img/part1/cow.png" align="middle" width="400px" />
+                            </figure>
+                        </div>
+                    </td>
+                    <td>
+                        <div style="display: flex; justify-content: center">
+                            <figure>
+                                <img src="./img/part1/teapot.png" align="middle" width="400px" />
+                            </figure>
+                        </div>
+                    </td>
+                </tr>
+                <br />
+            </table>
+        </div>
+
+        <h2>Part 2: Bounding Volume Hierarchy</h2>
+        <p>
+            To implement the bounding volume hierarchy, we first looped through the primitives and put them all in one
+            large bounding box. Then, we checked if the bounding box contained less than or equal to
+            <code>max_leaf_size</code>,
+            which is the base case. If it's within <code>max_leaf_size</code>, then this is a leaf node and we create a
+            new <code>BVHNode</code>,
+            setting the children parameters to <code>NULL</code> and setting <code>start</code> and <code>end</code> to
+            the start and end of the bounding box
+            primitives. If there are more than <code>max_leaf_size</code> number of primitives, we need to continue
+            splitting. The
+            heuristic we chose was the average of centroids, which we calculated by taking the sum of the centroids of
+            all the primitives and then dividing by the total number of primitives. To determine what axis to split
+            along, we found the axis with the greatest extent in the bounding box, since this means there is the
+            greatest variation in the primitives along that axis. We iterated through the primitives and split according
+            to the axis we found and the average centroid (if the magnitude of the vector along the axis is less than
+            that of the average centroid, then split to the left, else split to the right). We then checked the left and
+            right vectors of primitives - if either of them were empty, we moved the last primitive of the other side
+            into the empty one. Finally, we make two recursive calls to construct_bvh, passing in the left and right
+            partitions.
+        </p>
+        <p>
+            Below are a few images that we were able to render only after implementing BVH.
+        </p>
+        <div style="display: flex; justify-content: center">
+            <table style="width: 100%">
+                <tr>
+                    <td>
+                        <div style="display: flex; justify-content: center">
+                            <figure>
+                                <img src="./img/part2/pt2_lucy.png" align="middle" width="400px" />
+                            </figure>
+                        </div>
+                    </td>
+                    <td>
+                        <div style="display: flex; justify-content: center">
+                            <figure>
+                                <img src="./img/part2/pt2_dragon.png" align="middle" width="400px" />
+                            </figure>
+                        </div>
+                    </td>
+                </tr>
+                <br />
+                <tr>
+                    <td>
+                        <div style="display: flex; justify-content: center">
+                            <figure>
+                                <img src="./img/part2/pt2_maxplanck.png" align="middle" width="400px" />
+                            </figure>
+                        </div>
+                    </td>
+                    <td>
+                        <div style="display: flex; justify-content: center">
+                            <figure>
+                                <img src="./img/part2/pt2_walle.png" align="middle" width="400px" />
+                            </figure>
+                        </div>
+                    </td>
+                </tr>
+                <br />
+            </table>
+        </div>
+
+        <p>
+            Below is an analysis comparing rendering times with and without BVH.
+        </p>
+        <ul>
+            <li>Rendered <code>teapot.dae</code> with 2464 primitives. This took 0.0543s with BVH acceleration and
+                10.6990s without it.
+            </li>
+            <li>Rendered <code>cow.dae</code> with 5856 primitives. This took 0.0604s with BVH acceleration and
+                27.1755s without it.</li>
+            <li>Rendered <code>beetle.dae</code> with 7558 primitives. This took 0.0464s with BVH acceleration and
+                35.9235s without it.</li>
+        </ul>
+        <p>It is very obvious that with BVH implemented, we are performing much less intersection tests per ray and
+            thus, achieving a significant speedup time for rendering.</p>
+
+        <h2>Part 3: Direct Illumination</h2>
+        <p>
+            To implement Uniform Hemisphere sampling, we sampled uniformly within the hemisphere by using the
+            <code>hemisphereSampler->get_sample()</code> method. Using the
+            object-to-world matrix, we converted the sampled vector into world space. We then created a sample ray
+            originating from <code>hit_p</code> and going in the sampled direction (also setting the ray's
+            <code>min_t</code> field to <code>EPS_F</code> to
+            account for numerical precision issues). If the sampled ray intersects a light source, then we get the light
+            source color using
+            the BSDF of the intersection and calling <code>get_emission()</code>. Then, to get the color of the object
+            after the
+            light source hits it at this intersection, we calculate using the reflection equation and add the resulting
+            vector to <code>L_out</code>. We do this <code>num_samples</code> amount of times to get the adequate amount
+            of samples, and at the
+            end, we return <code>L_out</code> divided by the number of samples.
+        </p>
+        <p>To implement Importance Sampling, we only sample from lights instead of uniformly within
+            the hemisphere. To ensure we only sample from lights, we loop through <code>scene->lights</code>, which
+            contains all the
+            lights in the scene. If the light is a point light source, then we sample that direction with
+            sample_direction - we only need to do it once, because any samples from the point light source will be the
+            same. Else, if the light is an area light, we sample it <code>ns_area_light</code> number of times. We
+            average the output from each area light before adding it to <code>L_out</code>. Finally, we divide
+            <code>L_out</code> by the number of lights in the scene to get our final
+            result.
+        </p>
+        <P>Below are some images rendered with both implementations of the direct lighting function.</P>
+        <div style="display: flex; justify-content: center">
+            <table style="width: 100%">
+                <tr>
+                    <td>
+                        <div style="display: flex; justify-content: center">
+                            <figure>
+                                <img src="./img/part3/bunny_uniform.png" align="middle" width="400px" />
+                                <figcaption>Bunny with Uniform Hemisphere Sampling</figcaption>
+                            </figure>
+                        </div>
+                    </td>
+                    <td>
+                        <div style="display: flex; justify-content: center">
+                            <figure>
+                                <img src="./img/part3/bunny_importance.png" align="middle" width="400px" />
+                                <figcaption>Bunny with Importance Sampling</figcaption>
+                            </figure>
+                        </div>
+                    </td>
+                </tr>
+                <br />
+                <tr>
+                    <td>
+                        <div style="display: flex; justify-content: center">
+                            <figure>
+                                <img src="./img/part3/spheres_uniform.png" align="middle" width="400px" />
+                                <figcaption>Spheres with Uniform Hemisphere Sampling</figcaption>
+                            </figure>
+                        </div>
+                    </td>
+                    <td>
+                        <div style="display: flex; justify-content: center">
+                            <figure>
+                                <img src="./img/part3/spheres_importance.png" align="middle" width="400px" />
+                                <figcaption>Spheres with Importance Sampling</figcaption>
+                            </figure>
+                        </div>
+                    </td>
+                </tr>
+                <br />
+            </table>
+        </div>
+
+        <p>
+            Below is a comparison between the same scene, rendered with differing amounts of light rays sampled per area
+            light. It is very clear that as we increase the amount of samples per area light, the soft shadows cast by
+            the spheres on the floor become less noisy and more natural-looking. This is because the extra samples allow
+            us to render a more accurate shading.
+        </p>
+        <div style="display: flex; justify-content: center">
+            <table style="width: 100%">
+                <tr>
+                    <td>
+                        <div style="display: flex; justify-content: center">
+                            <figure>
+                                <img src="./img/part3/spheres_importance_1.png" align="middle" width="400px" />
+                                <figcaption>1 Sample per Area Light</figcaption>
+                            </figure>
+                        </div>
+                    </td>
+                    <td>
+                        <div style="display: flex; justify-content: center">
+                            <figure>
+                                <img src="./img/part3/spheres_importance_4.png" align="middle" width="400px" />
+                                <figcaption>4 Samples per Area Light</figcaption>
+                            </figure>
+                        </div>
+                    </td>
+                </tr>
+                <br />
+                <tr>
+                    <td>
+                        <div style="display: flex; justify-content: center">
+                            <figure>
+                                <img src="./img/part3/spheres_importance_16.png" align="middle" width="400px" />
+                                <figcaption>16 Samples per Area Light</figcaption>
+                            </figure>
+                        </div>
+                    </td>
+                    <td>
+                        <div style="display: flex; justify-content: center">
+                            <figure>
+                                <img src="./img/part3/spheres_importance_64.png" align="middle" width="400px" />
+                                <figcaption>64 Samples per Area Light</figcaption>
+                            </figure>
+                        </div>
+                    </td>
+                </tr>
+                <br />
+            </table>
+        </div>
+
+        <p>
+            The results from uniform hemisphere sampling are noisier than the images generated using importance
+            sampling, since we sample rays from anywhere within the scene. Importance sampling only samples from light
+            sources, which eliminates noise, causing the images to appear smoother. In the uniform hemisphere sampling
+            images, the light source at the top of the box emits a slight glow (it's fuzzier around the edges), while
+            the lighting sampling images do not (it's a clear cut shape).
+        </p>
+
+        <h2>Part 4: Global Illumination</h2>
+        <p>
+            To implement the indirect lighting function, we implemented <code>at_least_one_bounce_radiance</code>, which
+            calculates the
+            radiance generated from extra bounces after the first bounce, which we get from
+            <code>one_bounce_radiance</code>. This is because a ray intersecting an object can be from another object,
+            not just a light source. We then
+            model the incoming ray as an outgoing ray originating from <code>hit_p</code>, subtracting the depth field
+            by 1 because
+            we already got the original bounce. If the sample ray intersects the object, we make a recursive call to the
+            function to keep tracing the rays bouncing off successive objects until we reach the max depth, where it
+            will then return so that all the indirect lighting can be summed together for the final image. The
+            reflectance equation is similar to that used to calculate the direct lighting, except we also have to divide
+            by the pdf. Using this recursion, we can trace the path of these rays and estimate the light arriving at
+            each of these locations to calculate the final light that is reflected on the original object the camera is
+            capturing.
+        </p>
+
+        <p>Below are some images rendered with global illumination.</p>
+        <div style="display: flex; justify-content: center">
+            <table style="width: 100%">
+                <tr>
+                    <td>
+                        <div style="display: flex; justify-content: center">
+                            <figure>
+                                <img src="./img/part4/walle_s1024.png" align="middle" width="400px" />
+                            </figure>
+                        </div>
+                    </td>
+                    <td>
+                        <div style="display: flex; justify-content: center">
+                            <figure>
+                                <img src="./img/part4/bench_s1024.png" align="middle" width="400px" />
+                            </figure>
+                        </div>
+                    </td>
+                </tr>
+                <br />
+                <tr>
+                    <td>
+                        <div style="display: flex; justify-content: center">
+                            <figure>
+                                <img src="./img/part4/blob_s1024.png" align="middle" width="400px" />
+                            </figure>
+                        </div>
+                    </td>
+                    <td>
+                        <div style="display: flex; justify-content: center">
+                            <figure>
+                                <img src="./img/part4/dragon_s1024.png" align="middle" width="400px" />
+                            </figure>
+                        </div>
+                    </td>
+                </tr>
+                <br />
+            </table>
+        </div>
+        <p>Below is a scene rendered with only direct illumination (from Part 3) compared with only indirect
+            illumination.</p>
+        <div style="display: flex; justify-content: center">
+            <table style="width: 100%">
+                <tr>
+                    <td>
+                        <div style="display: flex; justify-content: center">
+                            <figure>
+                                <img src="./img/part4/spheres_direct.png" align="middle" width="400px" />
+                                <figcaption>Spheres rendered with direct illumination</figcaption>
+                            </figure>
+                        </div>
+                    </td>
+                    <td>
+                        <div style="display: flex; justify-content: center">
+                            <figure>
+                                <img src="./img/part4/spheres_indirect.png" align="middle" width="400px" />
+                                <figcaption>Spheres rendered with indirect illumination</figcaption>
+                            </figure>
+                        </div>
+                    </td>
+                </tr>
+                <br />
+            </table>
+        </div>
+
+        <p>
+            Below is <code>CBbunny.dae</code> rendered with different <code>max_ray_depth</code> values and
+            <code>isAccumBounces</code> set to <code>false</code>. In the second bounce of light (-m = 2) the bunny is
+            there, but much dimmer compared to the first. This is because as light bounces from object to object, its
+            energy is absorbed. We can see this trend continue in the third bounce of light as well. However, this
+            indirect lighting, when summed up will help create a more realistic and vibrant scene as opposed to just
+            rasterization, since there is more overall light.
+        </p>
+        <div style="display: flex; justify-content: center">
+            <table style="width: 100%">
+                <tr>
+                    <td>
+                        <div style="display: flex; justify-content: center">
+                            <figure>
+                                <img src="./img/part4/bunny_bounce_0.png" align="middle" width="400px" />
+                                <figcaption><code>-m = 0</code></figcaption>
+                            </figure>
+                        </div>
+                    </td>
+                    <td>
+                        <div style="display: flex; justify-content: center">
+                            <figure>
+                                <img src="./img/part4/bunny_bounce_1.png" align="middle" width="400px" />
+                                <figcaption><code>-m = 1</code></figcaption>
+                            </figure>
+                        </div>
+                    </td>
+                </tr>
+                <br />
+                <tr>
+                    <td>
+                        <div style="display: flex; justify-content: center">
+                            <figure>
+                                <img src="./img/part4/bunny_bounce_2.png" align="middle" width="400px" />
+                                <figcaption><code>-m = 2</code></figcaption>
+                            </figure>
+                        </div>
+                    </td>
+                    <td>
+                        <div style="display: flex; justify-content: center">
+                            <figure>
+                                <img src="./img/part4/bunny_bounce_3.png" align="middle" width="400px" />
+                                <figcaption><code>-m = 3</code></figcaption>
+                            </figure>
+                        </div>
+                    </td>
+                </tr>
+                <br />
+                <tr>
+                    <td>
+                        <div style="display: flex; justify-content: center">
+                            <figure>
+                                <img src="./img/part4/bunny_bounce_4.png" align="middle" width="400px" />
+                                <figcaption><code>-m = 4</code></figcaption>
+                            </figure>
+                        </div>
+                    </td>
+                    <td>
+                        <div style="display: flex; justify-content: center">
+                            <figure>
+                                <img src="./img/part4/bunny_bounce_5.png" align="middle" width="400px" />
+                                <figcaption><code>-m = 5</code></figcaption>
+                            </figure>
+                        </div>
+                    </td>
+                </tr>
+                <br />
+            </table>
+        </div>
+
+        <p>
+            Below is <code>CBbunny.dae</code> rendered with different <code>max_ray_depth</code> values and
+            <code>isAccumBounces</code> set to <code>true</code>.
+        </p>
+        <div style="display: flex; justify-content: center">
+            <table style="width: 100%">
+                <tr>
+                    <td>
+                        <div style="display: flex; justify-content: center">
+                            <figure>
+                                <img src="./img/part4/bunny_accum_0.png" align="middle" width="400px" />
+                                <figcaption><code>-m = 0</code></figcaption>
+                            </figure>
+                        </div>
+                    </td>
+                    <td>
+                        <div style="display: flex; justify-content: center">
+                            <figure>
+                                <img src="./img/part4/bunny_accum_1.png" align="middle" width="400px" />
+                                <figcaption><code>-m = 1</code></figcaption>
+                            </figure>
+                        </div>
+                    </td>
+                </tr>
+                <br />
+                <tr>
+                    <td>
+                        <div style="display: flex; justify-content: center">
+                            <figure>
+                                <img src="./img/part4/bunny_accum_2.png" align="middle" width="400px" />
+                                <figcaption><code>-m = 2</code></figcaption>
+                            </figure>
+                        </div>
+                    </td>
+                    <td>
+                        <div style="display: flex; justify-content: center">
+                            <figure>
+                                <img src="./img/part4/bunny_accum_3.png" align="middle" width="400px" />
+                                <figcaption><code>-m = 3</code></figcaption>
+                            </figure>
+                        </div>
+                    </td>
+                </tr>
+                <br />
+                <tr>
+                    <td>
+                        <div style="display: flex; justify-content: center">
+                            <figure>
+                                <img src="./img/part4/bunny_accum_4.png" align="middle" width="400px" />
+                                <figcaption><code>-m = 4</code></figcaption>
+                            </figure>
+                        </div>
+                    </td>
+                    <td>
+                        <div style="display: flex; justify-content: center">
+                            <figure>
+                                <img src="./img/part4/bunny_accum_5.png" align="middle" width="400px" />
+                                <figcaption><code>-m = 5</code></figcaption>
+                            </figure>
+                        </div>
+                    </td>
+                </tr>
+                <br />
+            </table>
+        </div>
+
+        <p>Below is <code>CBbunny.dae</code> rendered with different <code>max_ray_depth</code> values with Russian
+            roulette implemented.</p>
+        <div style="display: flex; justify-content: center">
+            <table style="width: 100%">
+                <tr>
+                    <td>
+                        <div style="display: flex; justify-content: center">
+                            <figure>
+                                <img src="./img/part4/bunny_accum_0.png" align="middle" width="400px" />
+                                <figcaption><code>-m = 0</code></figcaption>
+                            </figure>
+                        </div>
+                    </td>
+                    <td>
+                        <div style="display: flex; justify-content: center">
+                            <figure>
+                                <img src="./img/part4/bunny_rr_1.png" align="middle" width="400px" />
+                                <figcaption><code>-m = 1</code></figcaption>
+                            </figure>
+                        </div>
+                    </td>
+                </tr>
+                <br />
+                <tr>
+                    <td>
+                        <div style="display: flex; justify-content: center">
+                            <figure>
+                                <img src="./img/part4/bunny_rr_2.png" align="middle" width="400px" />
+                                <figcaption><code>-m = 2</code></figcaption>
+                            </figure>
+                        </div>
+                    </td>
+                    <td>
+                        <div style="display: flex; justify-content: center">
+                            <figure>
+                                <img src="./img/part4/bunny_rr_3.png" align="middle" width="400px" />
+                                <figcaption><code>-m = 3</code></figcaption>
+                            </figure>
+                        </div>
+                    </td>
+                </tr>
+                <br />
+                <tr>
+                    <td>
+                        <div style="display: flex; justify-content: center">
+                            <figure>
+                                <img src="./img/part4/bunny_rr_4.png" align="middle" width="400px" />
+                                <figcaption><code>-m = 4</code></figcaption>
+                            </figure>
+                        </div>
+                    </td>
+                    <td>
+                        <div style="display: flex; justify-content: center">
+                            <figure>
+                                <img src="./img/part4/bunny_rr_100.png" align="middle" width="400px" />
+                                <figcaption><code>-m = 100</code></figcaption>
+                            </figure>
+                        </div>
+                    </td>
+                </tr>
+                <br />
+            </table>
+        </div>
+
+        <p>Below is a scene rednered with various sample-per-pixel rates, <code>-l = 4</code> and <code>-m = 5</code>.
+        </p>
+        <div style="display: flex; justify-content: center">
+            <table style="width: 100%">
+                <tr>
+                    <td>
+                        <div style="display: flex; justify-content: center">
+                            <figure>
+                                <img src="./img/part4/spheres_s1.png" align="middle" width="400px" />
+                                <figcaption><code>-s = 1</code></figcaption>
+                            </figure>
+                        </div>
+                    </td>
+                    <td>
+                        <div style="display: flex; justify-content: center">
+                            <figure>
+                                <img src="./img/part4/spheres_s2.png" align="middle" width="400px" />
+                                <figcaption><code>-s = 2</code></figcaption>
+                            </figure>
+                        </div>
+                    </td>
+                </tr>
+                <br />
+                <tr>
+                    <td>
+                        <div style="display: flex; justify-content: center">
+                            <figure>
+                                <img src="./img/part4/spheres_s4.png" align="middle" width="400px" />
+                                <figcaption><code>-s = 4</code></figcaption>
+                            </figure>
+                        </div>
+                    </td>
+                    <td>
+                        <div style="display: flex; justify-content: center">
+                            <figure>
+                                <img src="./img/part4/spheres_s8.png" align="middle" width="400px" />
+                                <figcaption><code>-s = 8</code></figcaption>
+                            </figure>
+                        </div>
+                    </td>
+                </tr>
+                <br />
+                <tr>
+                    <td>
+                        <div style="display: flex; justify-content: center">
+                            <figure>
+                                <img src="./img/part4/spheres_s16.png" align="middle" width="400px" />
+                                <figcaption><code>-s = 16</code></figcaption>
+                            </figure>
+                        </div>
+                    </td>
+                    <td>
+                        <div style="display: flex; justify-content: center">
+                            <figure>
+                                <img src="./img/part4/spheres_s64.png" align="middle" width="400px" />
+                                <figcaption><code>-s = 64</code></figcaption>
+                            </figure>
+                        </div>
+                    </td>
+                </tr>
+                <br />
+            </table>
+        </div>
+        <div style="display: flex; justify-content: center">
+            <figure>
+                <img src="./img/part4/spheres_s1024.png" align="middle" width="400px" />
+                <figcaption><code>-s = 1024</code></figcaption>
+            </figure>
+        </div>
+
+        <h2>Part 5: Adaptive Sampling</h2>
+        <p>
+            Adaptive sampling adjusts the number of samples taken for each pixel according to whether or not the pixel
+            has converged. Since each pixel can converge at a different rate, some pixels will converge faster than
+            others, which means a lower sampling rate is needed to get rid of noise, while others will need a higher
+            sampling rate to converge. Adaptive sampling allows the samples to be concentrated on more difficult parts
+            of the image instead of having a high uniform sampling rate for all pixels in an image. In our
+            implementation, we added three variables, one to keep track of the sum of the illuminances, one to keep
+            track of the sum of the illuminances squared (used to calculate variance later), and one to keep track of
+            the current number of samples. After we get the estimated radiance, we call <code>illum()</code> on the
+            returned <code>Vector3D</code>
+            object to get the illuminance and add it to the respective sums. We then increment the count of samples so
+            far. Then, we check if the current number of samples is a multiple of <code>samplesPerBatch</code> - if it
+            is, then we
+            check to see if the pixel has converged by calculating the mean, variance, and standard deviation from the
+            sums we kept track of. This way, we can find the value \(I\) to measure the pixel's convergence. If \(I \le
+            maxTolerance \cdot \mu \), we update the pixel with the average radiance across the sampled rays
+            and set the
+            corresponding entry in <code>sampleCountBuffer</code> to the number of samples that were taken before
+            terminating.
+        </p>
+        <p>
+            Unfortunately, we were not able correctly implement adaptive sampling. Below is a comparison of the same
+            image rendered with and without adaptive sampling. It is very clear that the image with adaptive sampling is
+            much noisier than the one without, even in areas where there should have been many iterations of the
+            sampling loop before convergence. We identified the problem which is each pixel value converges immediately
+            after the first time we check for termination (after 64 samples in this case). The rate image reflects this
+            by being entirely blue. So we effectively have an image with the pixel sample rate as 64 instead of the
+            inputted 2048. Despite debugging attempts such as upping the confidence interval from 95% to 98% (1.96
+            to 2.33), we still did not produce any satisfying results.
+        </p>
+        <div style="display: flex; justify-content: center">
+            <table style="width: 100%">
+                <tr>
+                    <td>
+                        <div style="display: flex; justify-content: center">
+                            <figure>
+                                <img src="./img/part5/bunny_s2048_adaptive.png" align="middle" width="400px" />
+                                <figcaption>Adaptive sampling</figcaption>
+                            </figure>
+                        </div>
+                    </td>
+                    <td>
+                        <div style="display: flex; justify-content: center">
+                            <figure>
+                                <img src="./img/part5/bunny_s2048_no_adaptive.png" align="middle" width="400px" />
+                                <figcaption>No adaptive sampling</figcaption>
+                            </figure>
+                        </div>
+                    </td>
+                </tr>
+                <br />
+            </table>
+        </div>
+        <div style="display: flex; justify-content: center">
+            <figure>
+                <img src="./img/part5/bunny_s2048_adaptive_rate.png" align="middle" width="400px" />
+                <figcaption>Rate image</figcaption>
+            </figure>
+        </div>
+    </div>
+</body>
+
 </html>
