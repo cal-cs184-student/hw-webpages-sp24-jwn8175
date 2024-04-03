@@ -1,7 +1,679 @@
-<html>
-	<head>
-	</head>
-	<body>
-		Homework 4 index.html here
-	</body>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+    <head>
+        <style>
+            body {
+                padding: 100px;
+                width: 1000px;
+                margin: auto;
+                text-align: left;
+                font-weight: 300;
+                font-family: "Open Sans", sans-serif;
+                color: #121212;
+            }
+
+            h1,
+            h2,
+            h3,
+            h4 {
+                font-family: "Source Sans Pro", sans-serif;
+                text-align: center;
+            }
+
+            figcaption {
+                text-align: center;
+            }
+        </style>
+        <title>CS 184/284A ClothSim</title>
+        <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+        <link
+            href="https://fonts.googleapis.com/css?family=Open+Sans|Source+Sans+Pro"
+            rel="stylesheet"
+        />
+        <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+        <script
+            id="MathJax-script"
+            async
+            src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"
+        ></script>
+    </head>
+
+    <body style="background-color: slategray">
+        <h1>CS 184/284A: Computer Graphics and Imaging, Spring 2024</h1>
+        <h1>Homework 4: ClothSim</h1>
+        <h2>Jay Ni and Vanessa Qiu</h2>
+
+        <br /><br />
+
+        <div>
+            <h2>Overview</h2>
+            <p>
+                In this project we created a program that simulates the physical
+                movements of a piece of cloth. In order to make the simulation
+                realistic, we modeled the forces acting on the cloth to
+                determine how its position changed over time, and how collisions
+                would affect its position. After implementing the physics
+                simulator, we also implementing various shader programs in order
+                to create images with different shaders applied.
+            </p>
+
+            <h2>Part 1: Masses and Springs</h2>
+            <p>
+                In order to build the grid of masses and springs, we used the
+                following two formulas to determine the distance between each of
+                the point masses:
+                <code>width_increment = width / (num_width_points - 1.0)</code>
+                and
+                <code
+                    >double height_increment = height / (num_height_points -
+                    1.0)</code
+                >. For vertically oriented point masses, we generated the random
+                offset for the z-position with the following:
+                <code
+                    >double offset = ((double)rand() / RAND_MAX * 2.0 - 1.0) *
+                    0.001</code
+                >.
+            </p>
+            <p>
+                Since we added the point masses into the array in row-major
+                order, in order to retrieve the point mass at position \((i,
+                j)\) we simply index the position
+                <code>point_masses.at(j * num_width_points + i)</code>. This
+                allowed us to locate the required neighbors for each point mass
+                and create the springs between them.
+            </p>
+            <p>
+                Below are a few images of the wireframe after implementing this
+                part.
+            </p>
+            <div style="display: flex; justify-content: center">
+                <figure>
+                    <img src="./img/part1_full_frame.png" width="400px" />
+                    <figcaption>Full Wireframe with All Constraints</figcaption>
+                </figure>
+            </div>
+            <div style="display: flex; justify-content: center">
+                <table style="width: 100%">
+                    <tr>
+                        <td>
+                            <div style="display: flex; justify-content: center">
+                                <figure>
+                                    <img
+                                        src="./img/part1_shear_only.png"
+                                        width="400px"
+                                    />
+                                    <figcaption>
+                                        Only Shearing Constraints
+                                    </figcaption>
+                                </figure>
+                            </div>
+                        </td>
+                        <td>
+                            <div style="display: flex; justify-content: center">
+                                <figure>
+                                    <img
+                                        src="./img/part1_no_shear.png"
+                                        width="400px"
+                                    />
+                                    <figcaption>
+                                        No Shearing Constraints
+                                    </figcaption>
+                                </figure>
+                            </div>
+                        </td>
+                    </tr>
+                    <br />
+                </table>
+            </div>
+
+            <h2>Part 2: Simulation via Numerical Integration</h2>
+            <p>
+                For each time step, we compute the total force acting on each
+                point mass before using Verlet integration to compute the new
+                positions of each point mass. Then we implemented an additional
+                feature based on the SIGGRAPH 1995 Provot paper in order to
+                constrain the position update of each point mass.
+            </p>
+            <p>
+                Below are a few images of the cloth falling with varying
+                <code>ks</code> values. With a low ks value, the cloth appears
+                more slacking between the two pinned point masses, with some
+                creases along the edge. In contrast, with a high ks value, the
+                cloth between the two pinned point masses appears more taut and
+                less flexible.
+            </p>
+            <div style="display: flex; justify-content: center">
+                <table style="width: 100%">
+                    <tr>
+                        <td>
+                            <div style="display: flex; justify-content: center">
+                                <figure>
+                                    <img
+                                        src="./img/part2_low_ks.png"
+                                        width="400px"
+                                    />
+                                    <figcaption><code>ks = 5</code></figcaption>
+                                </figure>
+                            </div>
+                        </td>
+                        <td>
+                            <div style="display: flex; justify-content: center">
+                                <figure>
+                                    <img
+                                        src="./img/part2_high_ks.png"
+                                        width="400px"
+                                    />
+                                    <figcaption>
+                                        <code>ks = 200,000</code>
+                                    </figcaption>
+                                </figure>
+                            </div>
+                        </td>
+                    </tr>
+                    <br />
+                </table>
+            </div>
+            <p>
+                Below are a few images of the cloth falling with varying density
+                values. With a low density value, the behavior of the cloth
+                resembles that of when there is a high <code>ks</code> value:
+                more taut. This is likely due to the lower mass making external
+                forces have less of an impact. With a high density value, the
+                cloth exhibits the opposite behavior, with more slack between
+                the two pinned point masses.
+            </p>
+            <div style="display: flex; justify-content: center">
+                <table style="width: 100%">
+                    <tr>
+                        <td>
+                            <div style="display: flex; justify-content: center">
+                                <figure>
+                                    <img
+                                        src="./img/part2_low_density.png"
+                                        width="400px"
+                                    />
+                                    <figcaption>
+                                        <code>density = 1</code>
+                                    </figcaption>
+                                </figure>
+                            </div>
+                        </td>
+                        <td>
+                            <div style="display: flex; justify-content: center">
+                                <figure>
+                                    <img
+                                        src="./img/part2_high_density.png"
+                                        width="400px"
+                                    />
+                                    <figcaption>
+                                        <code>density = 150</code>
+                                    </figcaption>
+                                </figure>
+                            </div>
+                        </td>
+                    </tr>
+                    <br />
+                </table>
+            </div>
+            <p>
+                With a low damping value, the cloth falls and settles faster.
+                Notably, when the damping is at 0%, the cloth does not settle;
+                instead it swings back and forth chaotically. With a high
+                damping value, the cloth falls and settles like the default, but
+                at a much slower rate. Below is an image of the cloth in
+                mid-swing when the damping value is set to 0%.
+            </p>
+            <div style="display: flex; justify-content: center">
+                <figure>
+                    <img src="./img/part2_low_damping.png" width="800px" />
+                    <figcaption>
+                        <code>damping = 0%</code>
+                    </figcaption>
+                </figure>
+            </div>
+            <p>
+                Below is the result of the cloth falling with 4 pinned masses.
+                No other parameters were adjusted.
+            </p>
+            <div style="display: flex; justify-content: center">
+                <figure>
+                    <img src="./img/part2_pinned4.png" width="800px" />
+                </figure>
+            </div>
+
+            <h2>Part 3: Handling Collisions with Other Objects</h2>
+            <p>
+                In order to implement sphere collisions, we first checked to see
+                whether the passed in point mass was inside or exactly on the
+                sphere. We did this by checking if the distance between the
+                point mass and sphere's origin was less than or equal to the
+                sphere's radius. If the point mass was inside the sphere, we
+                extended the vector between the point mass and sphere's origin
+                in order to find the point at which it would have intersected
+                the sphere's surface. In order to derive this intersection
+                point, we obtained the vector between the point mass's position
+                and sphere's origin, calculated the magnitude of this vector,
+                scaled this vector by the sphere's radius over the vector's
+                magnitude, and then added this scaled vector to the coordinates
+                of the sphere's origin. We called this intersection point the
+                tangent point. If the point mass was exactly on the surface of
+                the sphere, we set the tangent point to the point mass's
+                position. Next, for both of these cases, we calculated the
+                correction vector by subtracting the point mass's last position
+                from the tangent point. And finally, we updated the point mass's
+                position by scaling the correction vector by 1 - friction and
+                adding this scaled vector to the point mass's last position.
+            </p>
+            <p>
+                In order to implement plane collisions, we first checked whether
+                the passed in point mass's last position and current position
+                were on different sides of the plane. In order to do this, we
+                used the plane's normal and point values to represent the plane
+                as an equation in point-normal form. Then we plugged in the
+                point mass's last position and position coordinates into the
+                plane equation and checked if the signs of the two resulting
+                values were opposite of each other. If they were, that meant
+                that they were on opposite sides of the plane and that there was
+                a collision. If there was a collision, we then calculated the
+                tangent point by finding the distance between the point mass and
+                the plane and subtracting this distance from the point mass's
+                position. Then we derived the correction vector by subtracting
+                the point mass's last position from the tangent point and adding
+                a small offset called the surface offset. And finally, we
+                updated the point mass's position by scaling the correction
+                vector by 1 - friction and adding this scaled vector to the
+                point mass's last position.
+            </p>
+            <p>
+                Below are some images with varying ks values in their final
+                resting state on the sphere.
+            </p>
+            <div style="display: flex; justify-content: center">
+                <table style="width: 100%">
+                    <tr>
+                        <td>
+                            <div style="display: flex; justify-content: center">
+                                <figure>
+                                    <img
+                                        src="./img/part3_sphere_500ks.png"
+                                        width="400px"
+                                    />
+                                    <figcaption>
+                                        <code>ks = 500</code>
+                                    </figcaption>
+                                </figure>
+                            </div>
+                        </td>
+                        <td>
+                            <div style="display: flex; justify-content: center">
+                                <figure>
+                                    <img
+                                        src="./img/part3_sphere_default.png"
+                                        width="400px"
+                                    />
+                                    <figcaption>
+                                        <code>ks = 5000</code>
+                                    </figcaption>
+                                </figure>
+                            </div>
+                        </td>
+                    </tr>
+                    <br />
+                </table>
+            </div>
+            <div style="display: flex; justify-content: center">
+                <figure>
+                    <img src="./img/part3_sphere_50000ks.png" width="400px" />
+                    <figcaption><code>ks = 50000</code></figcaption>
+                </figure>
+            </div>
+            <p>
+                As the <code>ks</code> value is increased from 500 N/m to 5000
+                N/m (the default) to 50,000 N/m, the cloth becomes less and less
+                draped over the sphere. While the cloth still comes to rest on
+                the sphere for all three simulations, the 500 N/m cloth has more
+                wrinkles along the side and comes to rest in a more vertical
+                position. In contrast, the sides of the 50,000 N/m cloth seems
+                more “floaty” around the edges and less vertical
+            </p>
+
+            <p>Below is the shaded cloth resting on the plane.</p>
+            <div style="display: flex; justify-content: center">
+                <figure>
+                    <img src="./img/part3_plane.png" width="800px" />
+                </figure>
+            </div>
+
+            <h2>Part 4: Handling Self-Collisions</h2>
+
+            <p>Below are images of the cloth falling in various stages.</p>
+            <div style="display: flex; justify-content: center">
+                <table style="width: 100%">
+                    <tr>
+                        <td>
+                            <div style="display: flex; justify-content: center">
+                                <figure>
+                                    <img
+                                        src="./img/part4_self_1.png"
+                                        width="400px"
+                                    />
+                                </figure>
+                            </div>
+                        </td>
+                        <td>
+                            <div style="display: flex; justify-content: center">
+                                <figure>
+                                    <img
+                                        src="./img/part4_self_2.png"
+                                        width="400px"
+                                    />
+                                </figure>
+                            </div>
+                        </td>
+                    </tr>
+                    <br />
+                    <tr>
+                        <td>
+                            <div style="display: flex; justify-content: center">
+                                <figure>
+                                    <img
+                                        src="./img/part4_self_3.png"
+                                        width="400px"
+                                    />
+                                </figure>
+                            </div>
+                        </td>
+                        <td>
+                            <div style="display: flex; justify-content: center">
+                                <figure>
+                                    <img
+                                        src="./img/part4_self_4.png"
+                                        width="400px"
+                                    />
+                                </figure>
+                            </div>
+                        </td>
+                    </tr>
+                    <br />
+                </table>
+            </div>
+            <p>
+                Below are images of the cloth falling and resting with varying
+                <code>ks</code> and density values.
+            </p>
+            <div style="display: flex; justify-content: center">
+                <table style="width: 100%">
+                    <tr>
+                        <td>
+                            <div style="display: flex; justify-content: center">
+                                <figure>
+                                    <img
+                                        src="./img/part4_1density_1000ks.png"
+                                        width="400px"
+                                    />
+                                    <figcaption>
+                                        <code>density = 1, ks = 1000</code>
+                                    </figcaption>
+                                </figure>
+                            </div>
+                        </td>
+                        <td>
+                            <div style="display: flex; justify-content: center">
+                                <figure>
+                                    <img
+                                        src="./img/part4_50density_7500ks.png"
+                                        width="400px"
+                                    />
+                                    <figcaption>
+                                        <code>density = 50, ks = 7500</code>
+                                    </figcaption>
+                                </figure>
+                            </div>
+                        </td>
+                    </tr>
+                    <br />
+                </table>
+            </div>
+            <p>
+                We did not notice any difference in how the cloth falls on
+                itself when varying the density and <code>ks</code>, in terms of
+                fall speed and shape. However, the cloth did seem to settle in a
+                final resting state much faster at the higher density and
+                <code>ks</code> value, whereas when the values were lower, it
+                fell more on itself and “wriggled” around on the plane before
+                finally settling.
+            </p>
+
+            <h2>Part 5: Shaders</h2>
+            <p>
+                Our shader program runs in parallel in the GPU, which speeds up
+                computation greatly in order to support real-time rendering. The
+                shader program consists of two parts: a vertex shader and a
+                fragment shader. The vertex shader computes and sets geometric
+                properties of vertices, such as their position in the world and
+                normal. After these values are computed, they get passed on to
+                the fragment shader, which uses these geometric properties to
+                compute the color that is seen by the camera based on what
+                shading technique we want.
+            </p>
+            <p>
+                Blinn-Phong shading combines three types of light to create one
+                color: the ambient light, diffuse reflection, and specular
+                reflection components. This allows the final output to have more
+                natural-looking lighting, since the diffuse reflection of rough
+                surfaces and the specular reflection of shiny surfaces are both
+                accounted for. Below are some sample images that demonstrate
+                this.
+            </p>
+            <div style="display: flex; justify-content: center">
+                <table style="width: 100%">
+                    <tr>
+                        <td>
+                            <div style="display: flex; justify-content: center">
+                                <figure>
+                                    <img
+                                        src="./img/part5_phong_ambient.png"
+                                        width="400px"
+                                    />
+                                    <figcaption>Only Ambient Light</figcaption>
+                                </figure>
+                            </div>
+                        </td>
+                        <td>
+                            <div style="display: flex; justify-content: center">
+                                <figure>
+                                    <img
+                                        src="./img/part5_phong_diffuse.png"
+                                        width="400px"
+                                    />
+                                    <figcaption>
+                                        Only Diffuse Reflection
+                                    </figcaption>
+                                </figure>
+                            </div>
+                        </td>
+                    </tr>
+                    <br />
+                    <tr>
+                        <td>
+                            <div style="display: flex; justify-content: center">
+                                <figure>
+                                    <img
+                                        src="./img/part5_phong_specular.png"
+                                        width="400px"
+                                    />
+                                    <figcaption>
+                                        Only Specular Reflection
+                                    </figcaption>
+                                </figure>
+                            </div>
+                        </td>
+                        <td>
+                            <div style="display: flex; justify-content: center">
+                                <figure>
+                                    <img
+                                        src="./img/part5_phong_full.png"
+                                        width="400px"
+                                    />
+                                    <figcaption>
+                                        Full Image with all Three Components
+                                    </figcaption>
+                                </figure>
+                            </div>
+                        </td>
+                    </tr>
+                    <br />
+                </table>
+            </div>
+            <p>
+                Below is a pair of images of our texture mapping shader using a
+                custom texture. Oski says hi!
+            </p>
+            <div style="display: flex; justify-content: center">
+                <table style="width: 100%">
+                    <tr>
+                        <td>
+                            <div style="display: flex; justify-content: center">
+                                <figure>
+                                    <img
+                                        src="./img/part5_oski_2.png"
+                                        width="400px"
+                                    />
+                                </figure>
+                            </div>
+                        </td>
+                        <td>
+                            <div style="display: flex; justify-content: center">
+                                <figure>
+                                    <img
+                                        src="./img/part5_oski_1.png"
+                                        width="400px"
+                                    />
+                                </figure>
+                            </div>
+                        </td>
+                    </tr>
+                    <br />
+                </table>
+            </div>
+            <p>
+                Below are images rendered with bump and displacement shading,
+                using texture_3.png. Comparing the two shaders, the sphere in
+                bump shading appears smoother than the one in displacement
+                shading. The sphere with displacement shading looks a lot more
+                rugged and deformed.
+            </p>
+            <div style="display: flex; justify-content: center">
+                <table style="width: 100%">
+                    <tr>
+                        <td>
+                            <div style="display: flex; justify-content: center">
+                                <figure>
+                                    <img
+                                        src="./img/part5_bump_cloth.png"
+                                        width="400px"
+                                    />
+                                    <figcaption>
+                                        The cloth resting on the sphere with
+                                        bump shading
+                                    </figcaption>
+                                </figure>
+                            </div>
+                        </td>
+                        <td>
+                            <div style="display: flex; justify-content: center">
+                                <figure>
+                                    <img
+                                        src="./img/part5_bump_sphere.png"
+                                        width="400px"
+                                    />
+                                    <figcaption>
+                                        The sphere with bump shading
+                                    </figcaption>
+                                </figure>
+                            </div>
+                        </td>
+                    </tr>
+                    <br />
+                </table>
+            </div>
+            <div style="display: flex; justify-content: center">
+                <figure>
+                    <img src="./img/part5_displacement.png" width="400px" />
+                    <figcaption>
+                        The sphere with displacement shading
+                    </figcaption>
+                </figure>
+            </div>
+            <p>
+                When changing the coarseness of the sphere, there seems to not
+                be much of a difference in the output with the bump shader.
+                However, the displacement shader has some very different
+                results. With <code>-o 16 -a 16</code>, the sphere isn't even
+                very round anymore. With <code>-o 128 -a 128</code>, the sphere
+                resembles the result in the previous section.
+            </p>
+            <div style="display: flex; justify-content: center">
+                <table style="width: 100%">
+                    <tr>
+                        <td>
+                            <div style="display: flex; justify-content: center">
+                                <figure>
+                                    <img
+                                        src="./img/part5_displacement_16.png"
+                                        width="400px"
+                                    />
+                                    <figcaption>
+                                        <code>-o 16 -a 16</code>
+                                    </figcaption>
+                                </figure>
+                            </div>
+                        </td>
+                        <td>
+                            <div style="display: flex; justify-content: center">
+                                <figure>
+                                    <img
+                                        src="./img/part5_displacement_128.png"
+                                        width="400px"
+                                    />
+                                    <figcaption>
+                                        <code>-o 128 -a 128</code>
+                                    </figcaption>
+                                </figure>
+                            </div>
+                        </td>
+                    </tr>
+                    <br />
+                </table>
+            </div>
+            <p>Below is a pair of images of our mirror shader.</p>
+            <div style="display: flex; justify-content: center">
+                <table style="width: 100%">
+                    <tr>
+                        <td>
+                            <div style="display: flex; justify-content: center">
+                                <figure>
+                                    <img
+                                        src="./img/part5_mirror_cloth.png"
+                                        width="400px"
+                                    />
+                                </figure>
+                            </div>
+                        </td>
+                        <td>
+                            <div style="display: flex; justify-content: center">
+                                <figure>
+                                    <img
+                                        src="./img/part5_mirror_sphere.png"
+                                        width="400px"
+                                    />
+                                </figure>
+                            </div>
+                        </td>
+                    </tr>
+                    <br />
+                </table>
+            </div>
+        </div>
+    </body>
 </html>
